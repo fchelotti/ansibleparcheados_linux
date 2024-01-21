@@ -1,0 +1,30 @@
+- name: Valida IP do servidor do SATELLITE
+  shell: |
+      cat /etc/hosts
+  register: hosts_verify
+
+- name: Print etc/hosts
+  debug:
+    msg: "{{ hosts_verify }}"
+
+- name: Adicionar o IP do servidor do SATELLITE
+  shell: |
+      cat <<EOF >> /etc/hosts
+      10.105.42.130 lcm001001-017.dominio.net lcm001001-017 
+      EOF
+  when: "'lcm001001-017' not in hosts_verify.stdout"
+
+- name: Valida instalação katello-ca-consumer
+  shell: rpm -qa |grep katello
+  become: true
+  become_method: sudo
+  become_user: root
+  register: katello_verify
+  ignore_errors: true
+
+- name: Instala katello-ca-consumer
+  shell: rpm -Uvh http://10.105.42.130/pub/katello-ca-consumer-latest.noarch.rpm
+  become: true
+  become_method: sudo
+  become_user: root
+  when:  "'katello-ca-consumer' not in katello_verify.stdout"

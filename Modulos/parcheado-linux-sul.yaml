@@ -1,0 +1,7 @@
+---
+- name: Parcheado Linux
+  hosts: linux
+  become: true
+  roles:
+    - role: linux-parcheado-sul
+    - role: Regionais/{{ subscription }}
